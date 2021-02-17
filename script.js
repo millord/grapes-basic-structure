@@ -133,8 +133,82 @@ const editor = grapesjs.init({
          }
         ]
       }]
+  },
+  // panels: {
+  //   defaults: [
+  //     // ...
+  //     {
+  //       id: 'panel-switcher',
+  //       el: '.panel__switcher',
+  //       buttons: [
+  //         // ...
+  //         {
+  //           id: 'show-traits',
+  //           active: true,
+  //           label: 'Traits',
+  //           command: 'show-traits',
+  //           togglable: false,
+  //       }],
+  //     }
+  //   ]
+  // },
+  // traitManager: {
+  //   appendTo: '.traits-container',
+  // }
+  deviceManager: {
+    devices: [{
+        name: 'Desktop',
+        width: '', // default size
+      }, {
+        name: 'Mobile',
+        width: '320px', // this value will be used on canvas width
+        widthMedia: '480px', // this value will be used in CSS @media
+    }]
+  },panels: {
+    defaults: [
+      // ...
+      {
+        id: 'panel-devices',
+        el: '.panel__devices',
+        buttons: [{
+            id: 'device-desktop',
+            label: 'D',
+            command: 'set-device-desktop',
+            active: true,
+            togglable: false,
+          }, {
+            id: 'device-mobile',
+            label: 'M',
+            command: 'set-device-mobile',
+            togglable: false,
+        }],
+      }
+    ]
+  },mediaCondition: 'min-width', // default is `max-width`
+  deviceManager: {
+    devices: [{
+        name: 'Mobile',
+        width: '320',
+        widthMedia: '',
+      }, {
+        name: 'Desktop',
+        width: '',
+        widthMedia:'1024',
+    }]
+  },storageManager: {
+    id: 'gjs-',             // Prefix identifier that will be used inside storing and loading
+    type: 'local',          // Type of the storage
+    autosave: true,         // Store data automatically
+    autoload: true,         // Autoload stored data on init
+    stepsBeforeSave: 1,     // If autosave enabled, indicates how many changes are necessary before store method is triggered
+    storeComponents: true,  // Enable/Disable storing of components in JSON format
+    storeStyles: true,      // Enable/Disable storing of rules in JSON format
+    storeHtml: true,        // Enable/Disable storing of components as HTML string
+    storeCss: true,         // Enable/Disable storing of rules as CSS string
   }
 });
+
+
 
 editor.Panels.addPanel({
   id: 'panel-top',
@@ -213,3 +287,35 @@ editor.Commands.add('show-styles', {
     smEl.style.display = 'none';
   },
 });
+
+
+
+// Define command
+// ...
+editor.Commands.add('show-traits', {
+  getTraitsEl(editor) {
+    const row = editor.getContainer().closest('.editor-row');
+    return row.querySelector('.traits-container');
+  },
+  run(editor, sender) {
+    this.getTraitsEl(editor).style.display = '';
+  },
+  stop(editor, sender) {
+    this.getTraitsEl(editor).style.display = 'none';
+  },
+});
+
+
+// Commands
+editor.Commands.add('set-device-desktop', {
+  run: editor => editor.setDevice('Desktop')
+});
+editor.Commands.add('set-device-mobile', {
+  run: editor => editor.setDevice('Mobile')
+});
+
+
+editor.on('change:device', () => console.log('Current device: ', editor.getDevice()));
+
+// Set initial device as Mobile
+editor.setDevice('Mobile');
